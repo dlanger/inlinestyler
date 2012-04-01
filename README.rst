@@ -7,8 +7,6 @@ inlinestyler - Making Styled HTML Email Easy
 :Source: http://github.com/dlanger/inlinestyler/
 :Keywords: inline, HTML, CSS, email, preflight
 
---
-
 `inlinestyler` is an easy way to locally inline CSS into an HTML email message.
 
 Styling HTML email is a `black art`_. CSS works, but only when it's been placed
@@ -23,15 +21,17 @@ service, and the guys behind it put a lot of work into keeping it up to date
 with the most recent discoveries in what works and what doesn't.
 
 `inlinestyler` takes (most) of the functionality of Premailer, and makes it 
-available locally, accessible without having call a remote service. To see 
-what `inline-styler` can do, check out this `demo`_.
+available locally, accessible without having call a remote service. 
+
+To see what `inline-styler` can do, check out this `demo`_.
 
 .. _`black art`: http://www.campaignmonitor.com/css/
 .. _`Premailer`: http://premailer.dialect.ca/
 .. _`demo`: http://inlinestyler.torchboxapps.com/
 
 History
--------
+=======
+
 `Dave Cranwell`_ wrote the original `inline-styler`_ single-app Django project, 
 and (graciously) released it. `inlinestyler` is a refactor of that project into 
 a free-standing package usable outside of Django.
@@ -57,7 +57,9 @@ is included with the package, but can be updated manually from
 Usage
 =====
 
-   from inlinestyler.utils import 
+::
+
+     from inlinestyler.utils import 
 
 
 ``message_external_css`` must be a string containing the message to be inlined, 
@@ -88,7 +90,5 @@ As far as I can tell, Dave Cranwell `released`_ the underlying `inline-styler`
 project into the public domain:
 
    I'm [...] releasing it to the public after many requests for the source.
-
-But I'm working on tracking that down for sure.
 
 .. _`released`: https://github.com/davecranwell/inline-styler/blob/c22a5fb67771d082ce0e999ea814dbdf2f05cdfe/README
