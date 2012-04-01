@@ -59,7 +59,8 @@ Usage
 
 ::
 
-     from inlinestyler.utils import 
+     from inlinestyler.utils import inline_css
+     message_inline_css = inline_css(message_external_css)
 
 
 ``message_external_css`` must be a string containing the message to be inlined, 
