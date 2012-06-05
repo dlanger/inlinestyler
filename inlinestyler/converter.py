@@ -11,8 +11,6 @@ from cssutils.script import csscombine
 from cssutils.script import CSSCapture
 from cssselect import CSSSelector, ExpressionError
 
-from django.conf import settings
-
 class Conversion:
     def __init__(self):
         self.CSSErrors=[]
