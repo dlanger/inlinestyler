@@ -1,0 +1,4 @@
+0.1.6
+=====
+
+* Removing an unneeded Django dependency (thanks Daniel Schaefer)
