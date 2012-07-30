@@ -2,3 +2,8 @@
 =====
 
 * Removing an unneeded Django dependency (thanks Daniel Schaefer)
+
+0.1.7
+=====
+
+* Removing a print statement that dumped a linebreak to `stdout` (thanks Halil Köklü)
