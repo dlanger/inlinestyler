@@ -38,7 +38,6 @@ class Conversion:
                 raise IOError('The stylesheet '+element.get("href")+' could not be found')
 
         #include inline style elements
-        print aggregateCSS
         CSSStyleSelector = CSSSelector("style,Style")
         matching = CSSStyleSelector.evaluate(document)
         for element in matching:
