@@ -1,17 +1,24 @@
 import os
 import sys
-import urllib
 import codecs
-import urlparse
+try:
+    import urlparse
+    from urllib import FancyURLopener
+    from urllib import urlopen
+except ImportError:
+    import urllib.parse as urlparse
+    from urllib.request import FancyURLopener
+    from urllib.request import urlopen
 import csv
 import cssutils
 
 from lxml import etree
 from cssutils.script import csscombine
 from cssutils.script import CSSCapture
-from cssselect import CSSSelector, ExpressionError
+from inlinestyler.cssselect import CSSSelector, ExpressionError
 
-class Conversion:
+
+class Conversion(object):
     def __init__(self):
         self.CSSErrors=[]
         self.CSSUnsupportErrors=dict()
@@ -31,7 +38,7 @@ class Conversion:
                     if element.get("href").lower().find("http://",0) < 0:
                         parsedUrl=urlparse.urlparse(sourceURL);
                         csspath=urlparse.urljoin(parsedUrl.scheme+"://"+parsedUrl.hostname, csspath)
-                f=urllib.urlopen(csspath)
+                f=urlopen(csspath)
                 aggregateCSS+=''.join(f.read())
                 element.getparent().remove(element)
             except:
@@ -56,7 +63,7 @@ class Conversion:
 
         #convert tree back to plain text html
         self.convertedHTML = etree.tostring(document, method="xml", pretty_print=True,encoding='UTF-8')
-        self.convertedHTML= self.convertedHTML.replace('&#13;', '') #tedious raw conversion of line breaks.
+        self.convertedHTML= self.convertedHTML.decode('utf-8').replace('&#13;', '') #tedious raw conversion of line breaks.
 
         return self
 
@@ -170,5 +177,5 @@ class Conversion:
             self.supportPercentage= 100- ((float(supportFailRate)/float(supportTotalRate)) * 100)
         return view
 
-class MyURLopener(urllib.FancyURLopener):
-    http_error_default = urllib.URLopener.http_error_default
+class MyURLopener(FancyURLopener):
+    http_error_default = FancyURLopener.http_error_default
