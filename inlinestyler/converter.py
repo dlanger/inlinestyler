@@ -18,7 +18,7 @@ class Conversion:
         self.supportPercentage=100
         self.convertedHTML=""
 
-    def perform(self,document,sourceHTML,sourceURL):
+    def perform(self, document, sourceHTML, sourceURL, encoding=None):
         aggregateCSS="";
 
         # retrieve CSS rel links from html pasted and aggregate into one string
@@ -55,7 +55,7 @@ class Conversion:
                 element.set('style', v)
 
         #convert tree back to plain text html
-        self.convertedHTML = etree.tostring(document, method="xml", pretty_print=True,encoding='UTF-8')
+        self.convertedHTML = etree.tostring(document, method="xml", pretty_print=True, encoding=encoding)
         self.convertedHTML= self.convertedHTML.replace('&#13;', '') #tedious raw conversion of line breaks.
 
         return self
