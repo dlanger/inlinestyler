@@ -17,6 +17,7 @@ class Conversion:
         self.CSSUnsupportErrors=dict()
         self.supportPercentage=100
         self.convertedHTML=""
+        self.mediaRules=""
 
     def perform(self,document,sourceHTML,sourceURL):
         aggregateCSS="";
@@ -53,6 +54,13 @@ class Conversion:
             if element.tag not in ignoreList:
                 v = style.getCssText(separator=u'')
                 element.set('style', v)
+
+        if self.mediaRules:
+            bodyTag = document.find('body')
+            if bodyTag is not None:
+                styleTag = etree.Element('style', type="text/css")
+                styleTag.text = self.mediaRules
+                bodyTag.insert(0, styleTag)
 
         #convert tree back to plain text html
         self.convertedHTML = etree.tostring(document, method="xml", pretty_print=True,encoding='UTF-8')
@@ -93,8 +101,16 @@ class Conversion:
         #sheet = csscombine(path="http://www.torchbox.com/css/front/import.css")
         sheet = cssutils.parseString(css)
 
-        rules = (rule for rule in sheet if rule.type == rule.STYLE_RULE)
+        keep_rules = []
+        rules = (rule for rule in sheet if rule.type in [rule.STYLE_RULE, rule.MEDIA_RULE])
         for rule in rules:
+            # these rule can't be handled staticly
+            if rule.type == rule.MEDIA_RULE:
+                keep_rules.append(rule)
+                continue
+            elif any(pseudo in rule.selectorText for pseudo in [':hover', ':active', ':visited']):
+                keep_rules.append(rule)
+                continue
 
             for selector in rule.selectorList:
                 try:
@@ -161,6 +177,9 @@ class Conversion:
                     if str(sys.exc_info()[1]) not in self.CSSErrors:
                         self.CSSErrors.append(str(sys.exc_info()[1]))
                     pass
+
+        rules = (rule.cssText.strip() for rule in keep_rules)
+        self.mediaRules = u'\n'.join(rules)
 
         for props, propvals in supportratios.items():
             supportFailRate+=(propvals['usage']) * int(propvals['failedClients'])
