@@ -172,6 +172,7 @@ class Conversion:
                                 if not sameprio and bool(p.priority) or (sameprio and selector.specificity >= specificities[element][p.name]):
                                     # later, more specific or higher prio
                                     view[element].setProperty(p.name, p.value, p.priority)
+                                    specificities[element][p.name] = selector.specificity
 
                 except ExpressionError:
                     if str(sys.exc_info()[1]) not in self.CSSErrors:
