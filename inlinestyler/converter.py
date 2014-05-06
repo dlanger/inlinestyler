@@ -5,11 +5,22 @@ import codecs
 import urlparse
 import csv
 import cssutils
+import re
 
 from lxml import etree
 from cssutils.script import csscombine
 from cssutils.script import CSSCapture
 from cssselect import CSSSelector, ExpressionError
+
+_url_re = re.compile(r'''url\((['"]?)([^'"\)]+)(['"]?)\)''', re.I)
+
+
+def fix_relative_urls(text, sourceURL):
+    def fix_url(match):
+        return 'url(' + match.group(1) + urlparse.urljoin(sourceURL, match.group(2)) + match.group(3) + ')'
+    
+    return _url_re.sub(fix_url, text)
+
 
 class Conversion:
     def __init__(self):
@@ -20,29 +31,29 @@ class Conversion:
         self.mediaRules=""
 
     def perform(self,document,sourceHTML,sourceURL):
-        aggregateCSS="";
+        aggregateCSS = ""
+        if sourceURL and not sourceURL.endswith('/'):
+            sourceURL += '/'
 
         # retrieve CSS rel links from html pasted and aggregate into one string
-        CSSRelSelector = CSSSelector("link[rel=stylesheet],link[rel=StyleSheet],link[rel=STYLESHEET]")
+        CSSRelSelector = CSSSelector("link[rel=stylesheet],link[rel=StyleSheet],link[rel=STYLESHEET],style,Style")
         matching = CSSRelSelector.evaluate(document)
         for element in matching:
-            try:
-                csspath=element.get("href")
-                if len(sourceURL):
-                    if element.get("href").lower().find("http://",0) < 0:
-                        parsedUrl=urlparse.urlparse(sourceURL);
-                        csspath=urlparse.urljoin(parsedUrl.scheme+"://"+parsedUrl.hostname, csspath)
-                f=urllib.urlopen(csspath)
-                aggregateCSS+=''.join(f.read())
-                element.getparent().remove(element)
-            except:
-                raise IOError('The stylesheet '+element.get("href")+' could not be found')
+            if element.tag.lower() == 'style':
+                csstext = element.text
+                if sourceURL:
+                    csstext = fix_relative_urls(csstext, sourceURL)
+            else:
+                try:
+                    csspath = element.get("href")
+                    if sourceURL:
+                        csspath = urlparse.urljoin(sourceURL, csspath)
+                    f = urllib.urlopen(csspath)
+                    csstext = fix_relative_urls(f.read(), csspath)
+                except:
+                    raise IOError('The stylesheet ' + element.get("href") + ' could not be found')
 
-        #include inline style elements
-        CSSStyleSelector = CSSSelector("style,Style")
-        matching = CSSStyleSelector.evaluate(document)
-        for element in matching:
-            aggregateCSS+=element.text
+            aggregateCSS += csstext
             element.getparent().remove(element)
 
         #convert  document to a style dictionary compatible with etree
@@ -61,6 +72,14 @@ class Conversion:
                 styleTag = etree.Element('style', type="text/css")
                 styleTag.text = self.mediaRules
                 bodyTag.insert(0, styleTag)
+
+        if sourceURL:
+            for attr in ('href', 'src'):
+                for item in document.xpath("//@%s" % attr):
+                    parent = item.getparent()
+                    if attr == 'href' and parent.attrib[attr].startswith('#'):
+                        continue
+                    parent.attrib[attr] = urlparse.urljoin(sourceURL, parent.attrib[attr])
 
         #convert tree back to plain text html
         self.convertedHTML = etree.tostring(document, method="xml", pretty_print=True,encoding='UTF-8')
