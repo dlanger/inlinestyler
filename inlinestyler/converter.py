@@ -1,15 +1,12 @@
 import os
 import sys
-import urllib
-import codecs
 import urlparse
 import csv
 import cssutils
 import re
 
+import requests
 from lxml import etree
-from cssutils.script import csscombine
-from cssutils.script import CSSCapture
 from cssselect import CSSSelector, ExpressionError
 
 _url_re = re.compile(r'''url\((['"]?)([^'"\)]+)(['"]?)\)''', re.I)
@@ -18,7 +15,7 @@ _url_re = re.compile(r'''url\((['"]?)([^'"\)]+)(['"]?)\)''', re.I)
 def fix_relative_urls(text, sourceURL):
     def fix_url(match):
         return 'url(' + match.group(1) + urlparse.urljoin(sourceURL, match.group(2)) + match.group(3) + ')'
-    
+
     return _url_re.sub(fix_url, text)
 
 
@@ -48,8 +45,8 @@ class Conversion:
                     csspath = element.get("href")
                     if sourceURL:
                         csspath = urlparse.urljoin(sourceURL, csspath)
-                    f = urllib.urlopen(csspath)
-                    csstext = fix_relative_urls(f.read(), csspath)
+                    r = requests.get(csspath)
+                    csstext = fix_relative_urls(r.text, csspath)
                 except:
                     raise IOError('The stylesheet ' + element.get("href") + ' could not be found')
 
@@ -208,6 +205,3 @@ class Conversion:
         if(supportFailRate and supportTotalRate):
             self.supportPercentage= 100- ((float(supportFailRate)/float(supportTotalRate)) * 100)
         return view
-
-class MyURLopener(urllib.FancyURLopener):
-    http_error_default = urllib.URLopener.http_error_default
