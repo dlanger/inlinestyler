@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-    
+
 setup(
     name='inlinestyler',
     version=__import__('inlinestyler').__version__,
@@ -27,6 +27,6 @@ setup(
         'Topic :: Text Processing :: Markup :: HTML',
         ],
     install_requires=[
-	'cssutils',
-	]
+        'cssutils', 'requests>=1.0'
+    ]
 )
