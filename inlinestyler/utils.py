@@ -1,5 +1,5 @@
 from lxml import etree
-from converter import Conversion
+from inlinestyler.converter import Conversion
 
 def inline_css(html_message):
     """
