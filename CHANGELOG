@@ -12,3 +12,8 @@
 =====
 
 * Python 3.3 fixes (thanks Piotr Maliński)
+
+0.2.1
+=====
+
+* Can set encoding on the inlined CSS (thanks macro1)
