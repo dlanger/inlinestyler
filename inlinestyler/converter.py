@@ -1,102 +1,97 @@
 import os
 import sys
-import codecs
+
 try:
     import urlparse
-    from urllib import FancyURLopener
-    from urllib import urlopen
 except ImportError:
     import urllib.parse as urlparse
-    from urllib.request import FancyURLopener
-    from urllib.request import urlopen
+
 import csv
 import cssutils
 
+import requests
 from lxml import etree
-from cssutils.script import csscombine
-from cssutils.script import CSSCapture
 from inlinestyler.cssselect import CSSSelector, ExpressionError
 
 
 class Conversion(object):
     def __init__(self):
-        self.CSSErrors=[]
-        self.CSSUnsupportErrors=dict()
-        self.supportPercentage=100
-        self.convertedHTML=""
+        self.CSSErrors = []
+        self.CSSUnsupportErrors = dict()
+        self.supportPercentage = 100
+        self.convertedHTML = ""
 
     def perform(self, document, sourceHTML, sourceURL, encoding=None):
-        aggregateCSS="";
+        aggregate_css = ""
 
-        # retrieve CSS rel links from html pasted and aggregate into one string
+        # Retrieve CSS rel links from html pasted and aggregate into one string
         CSSRelSelector = CSSSelector("link[rel=stylesheet],link[rel=StyleSheet],link[rel=STYLESHEET]")
         matching = CSSRelSelector.evaluate(document)
         for element in matching:
             try:
-                csspath=element.get("href")
+                csspath = element.get("href")
                 if len(sourceURL):
-                    if element.get("href").lower().find("http://",0) < 0:
-                        parsedUrl=urlparse.urlparse(sourceURL);
-                        csspath=urlparse.urljoin(parsedUrl.scheme+"://"+parsedUrl.hostname, csspath)
-                f=urlopen(csspath)
-                aggregateCSS+=''.join(f.read())
+                    if element.get("href").lower().find("http://", 0) < 0:
+                        parsed_url = urlparse.urlparse(sourceURL)
+                        csspath = urlparse.urljoin(parsed_url.scheme + "://" + parsed_url.hostname, csspath)
+
+                css_content = requests.get(csspath).text
+                aggregate_css += ''.join(css_content)
+
                 element.getparent().remove(element)
             except:
-                raise IOError('The stylesheet '+element.get("href")+' could not be found')
+                raise IOError('The stylesheet ' + element.get("href") + ' could not be found')
 
-        #include inline style elements
+        # Include inline style elements
         CSSStyleSelector = CSSSelector("style,Style")
         matching = CSSStyleSelector.evaluate(document)
         for element in matching:
-            aggregateCSS+=element.text
+            aggregate_css += element.text
             element.getparent().remove(element)
 
-        #convert  document to a style dictionary compatible with etree
-        styledict = self.getView(document, aggregateCSS)
+        # Convert document to a style dictionary compatible with etree
+        styledict = self.get_view(document, aggregate_css)
 
-        #set inline style attribute if not one of the elements not worth styling
-        ignoreList=['html','head','title','meta','link','script']
+        # Set inline style attribute if not one of the elements not worth styling
+        ignore_list = ['html', 'head', 'title', 'meta', 'link', 'script']
         for element, style in styledict.items():
-            if element.tag not in ignoreList:
+            if element.tag not in ignore_list:
                 v = style.getCssText(separator=u'')
                 element.set('style', v)
 
-        #convert tree back to plain text html
-        self.convertedHTML = etree.tostring(document, method="xml", pretty_print=True,encoding=encoding)
-        self.convertedHTML= self.convertedHTML.decode(encoding).replace('&#13;', '') #tedious raw conversion of line breaks.
+        self.convertedHTML = etree.tostring(document, method="xml", pretty_print=True, encoding=encoding)
+        self.convertedHTML = self.convertedHTML.decode(encoding).replace('&#13;', '')  # Tedious raw conversion of line breaks.
         return self
 
-    def styleattribute(self,element):
+    def styleattribute(self, element):
         """
           returns css.CSSStyleDeclaration of inline styles, for html: @style
           """
-        cssText = element.get('style')
-        if cssText:
-            return cssutils.css.CSSStyleDeclaration(cssText=cssText)
+        css_text = element.get('style')
+        if css_text:
+            return cssutils.css.CSSStyleDeclaration(cssText=css_text)
         else:
             return None
 
-    def getView(self, document, css):
+    def get_view(self, document, css):
 
         view = {}
         specificities = {}
-        supportratios={}
-        supportFailRate=0
-        supportTotalRate=0;
-        compliance=dict()
+        supportratios = {}
+        support_failrate = 0
+        support_totalrate = 0
+        compliance = dict()
 
-        #load CSV containing css property client support into dict
         mycsv = csv.DictReader(open(os.path.join(os.path.dirname(__file__), "css_compliance.csv")), delimiter=',')
 
         for row in mycsv:
-            #count clients so we can calculate an overall support percentage later
-            clientCount=len(row)
-            compliance[row['property'].strip()]=dict(row);
+            # Count clients so we can calculate an overall support percentage later
+            client_count = len(row)
+            compliance[row['property'].strip()] = dict(row)
 
-        #decrement client count to account for first col which is property name
-        clientCount-=1
+        # Decrement client count to account for first col which is property name
+        client_count -= 1
 
-        #sheet = csscombine(path="http://www.torchbox.com/css/front/import.css")
         sheet = cssutils.parseString(css)
 
         rules = (rule for rule in sheet if rule.type == rule.STYLE_RULE)
@@ -115,35 +110,34 @@ class Conversion(object):
                             specificities[element] = {}
 
                             # add inline style if present
-                            inlinestyletext= element.get('style')
+                            inlinestyletext = element.get('style')
                             if inlinestyletext:
-                                inlinestyle= cssutils.css.CSSStyleDeclaration(cssText=inlinestyletext)
+                                inlinestyle = cssutils.css.CSSStyleDeclaration(cssText=inlinestyletext)
                             else:
                                 inlinestyle = None
                             if inlinestyle:
                                 for p in inlinestyle:
                                     # set inline style specificity
                                     view[element].setProperty(p)
-                                    specificities[element][p.name] = (1,0,0,0)
+                                    specificities[element][p.name] = (1, 0, 0, 0)
 
                         for p in rule.style:
-                            #create supportratio dic item for this property
                             if p.name not in supportratios:
-                                supportratios[p.name]={'usage':0,'failedClients':0}
-                            #increment usage
-                            supportratios[p.name]['usage']+=1
+                                supportratios[p.name] = {'usage': 0, 'failedClients': 0}
+
+                            supportratios[p.name]['usage'] += 1
 
                             try:
-                                if not p.name in self.CSSUnsupportErrors:
+                                if p.name not in self.CSSUnsupportErrors:
                                     for client, support in compliance[p.name].items():
-                                        if support == "N" or support=="P":
-                                            #increment client failure count for this property
-                                            supportratios[p.name]['failedClients']+=1
-                                            if not p.name in self.CSSUnsupportErrors:
+                                        if support == "N" or support == "P":
+                                            # Increment client failure count for this property
+                                            supportratios[p.name]['failedClients'] += 1
+                                            if p.name not in self.CSSUnsupportErrors:
                                                 if support == "P":
-                                                    self.CSSUnsupportErrors[p.name]=[client + ' (partial support)']
+                                                    self.CSSUnsupportErrors[p.name] = [client + ' (partial support)']
                                                 else:
-                                                    self.CSSUnsupportErrors[p.name]=[client]
+                                                    self.CSSUnsupportErrors[p.name] = [client]
                                             else:
                                                 if support == "P":
                                                     self.CSSUnsupportErrors[p.name].append(client + ' (partial support)')
@@ -169,12 +163,9 @@ class Conversion(object):
                     pass
 
         for props, propvals in supportratios.items():
-            supportFailRate+=(propvals['usage']) * int(propvals['failedClients'])
-            supportTotalRate+=int(propvals['usage']) * clientCount
+            support_failrate += (propvals['usage']) * int(propvals['failedClients'])
+            support_totalrate += int(propvals['usage']) * client_count
 
-        if(supportFailRate and supportTotalRate):
-            self.supportPercentage= 100- ((float(supportFailRate)/float(supportTotalRate)) * 100)
+        if support_failrate and support_totalrate:
+            self.supportPercentage = 100 - ((float(support_failrate) / float(support_totalrate)) * 100)
         return view
-
-class MyURLopener(FancyURLopener):
-    http_error_default = FancyURLopener.http_error_default
