@@ -17,3 +17,8 @@
 =====
 
 * Can set encoding on the inlined CSS (thanks macro1)
+
+0.2.2
+=====
+
+* Better classifiers in `setup.py` to show language compatability (thanks Kevin Campbell)
