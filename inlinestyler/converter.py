@@ -35,11 +35,16 @@ class Conversion(object):
             try:
                 csspath=element.get("href")
                 if len(sourceURL):
-                    if element.get("href").lower().find("http://",0) < 0:
-                        parsedUrl=urlparse.urlparse(sourceURL);
+                    if element.get("href").lower().find("http://", 0) < 0:
+                        parsedUrl=urlparse.urlparse(sourceURL)
                         csspath=urlparse.urljoin(parsedUrl.scheme+"://"+parsedUrl.hostname, csspath)
                 f=urlopen(csspath)
-                aggregateCSS+=''.join(f.read())
+                css_content = f.read()
+
+                if css_content.__class__ != str:
+                    css_content = css_content.decode('utf-8' if encoding is None else encoding)
+
+                aggregateCSS+=''.join(css_content)
                 element.getparent().remove(element)
             except:
                 raise IOError('The stylesheet '+element.get("href")+' could not be found')
