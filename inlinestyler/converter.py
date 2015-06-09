@@ -1,6 +1,7 @@
 import os
 import sys
 import codecs
+import gzip, StringIO
 try:
     import urlparse
     from urllib import FancyURLopener
@@ -38,10 +39,20 @@ class Conversion(object):
                     if element.get("href").lower().find("http://",0) < 0:
                         parsedUrl=urlparse.urlparse(sourceURL);
                         csspath=urlparse.urljoin(parsedUrl.scheme+"://"+parsedUrl.hostname, csspath)
-                f=urlopen(csspath)
-                aggregateCSS+=''.join(f.read())
+                f = urlopen(csspath)
+
+                # check GZIP header
+                if dict(f.info()).get('content-encoding') == 'gzip':
+                    gzip_file = StringIO.StringIO(f.read())
+                    #Decompress styles
+                    ungziped_file = gzip.GzipFile(fileobj=gzip_file)
+                    style_body = ungziped_file.read()
+                else:
+                    style_body = f.read()
+
+                aggregateCSS += style_body
                 element.getparent().remove(element)
-            except:
+            except IndexError:
                 raise IOError('The stylesheet '+element.get("href")+' could not be found')
 
         #include inline style elements
