@@ -52,7 +52,7 @@ class Conversion(object):
 
                 aggregateCSS += style_body
                 element.getparent().remove(element)
-            except IndexError:
+            except:
                 raise IOError('The stylesheet '+element.get("href")+' could not be found')
 
         #include inline style elements
