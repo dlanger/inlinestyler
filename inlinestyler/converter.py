@@ -13,8 +13,32 @@ import requests
 from lxml import etree
 from inlinestyler.cssselect import CSSSelector, ExpressionError
 
+import re
+
 
 class Conversion(object):
+
+    # regex for find url in css file
+    REGEX_URL = re.compile(
+        r"""url\(['"]?(?P<url>[^'")]+)['"]?\)""",
+        re.I |
+        re.M
+    )
+
+    @staticmethod
+    def replace_url(css_path, match_obj):
+        up = urlparse.urlparse(match_obj.group('url'))
+        # relative url?
+        if up.netloc == '':
+            return 'url({0})'.format(
+                urlparse.urljoin(
+                    css_path,
+                    match_obj.group('url')
+                )
+            )
+        else:
+            return match_obj.group(0)
+
     def __init__(self):
         self.CSSErrors = []
         self.CSSUnsupportErrors = dict()
@@ -27,6 +51,7 @@ class Conversion(object):
         # Retrieve CSS rel links from html pasted and aggregate into one string
         CSSRelSelector = CSSSelector("link[rel=stylesheet],link[rel=StyleSheet],link[rel=STYLESHEET]")
         matching = CSSRelSelector.evaluate(document)
+
         for element in matching:
             try:
                 csspath = element.get("href")
@@ -36,6 +61,14 @@ class Conversion(object):
                         csspath = urlparse.urljoin(parsed_url.scheme + "://" + parsed_url.hostname, csspath)
 
                 css_content = requests.get(csspath).text
+
+                # section: replace relative url to absolute url in css file
+                lr = lambda match_obj: Conversion.replace_url(csspath, match_obj)
+
+                css_content = Conversion.REGEX_URL.sub(lr, css_content)
+
+                # endsection
+
                 aggregate_css += ''.join(css_content)
 
                 element.getparent().remove(element)
