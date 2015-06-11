@@ -2,7 +2,7 @@
 inlinestyler - Making Styled HTML Email Easy
 ============================================
 
-:Version: 0.1.7
+:Version: 0.2.1
 :Download: http://pypi.python.org/pypi/inlinestyler/
 :Source: http://github.com/dlanger/inlinestyler/
 :Keywords: inline, HTML, CSS, email, preflight
@@ -44,8 +44,8 @@ Requirements
 
 `inlinestyler` requires the following packages in order to run:
 
-* ``cssutils`` (which will be installed by ``pip``)
-* ``lxml`` (which we assume you already have installed through your OS)
+* ``cssutils`` 
+* ``lxml`` 
 
 It also requires a ``css_complaiance.csv`` file, which indicates the 
 compatibility of various email clients with certain CSS features. This
@@ -78,8 +78,27 @@ Contributions
 
 All development happens at github: http://github.com/dlanger/inlinestyler.
 
+To get yourself started:
+
+#. Clone this repo somewhere
+#. ``make init`` to install the right dependencies
+#. ``make test`` to run the test suite
+
 Contributions are always more than welcome. If you see something missing, add it
 in and send me a pull request.
+
+**NOTE**: Ubuntu 12.04 (and some other distros) include ``libxslt`` version
+``1.1.26``, which changes the now-empty ``<head>`` tag to ``<head/>`` - which 
+isn't valid HTML 5. To see which version of ``libxslt`` was used to build
+your ``libxml``, examine the output of ``make init`` and look for the 
+line that looks like ``Using build configuration of libxslt 1.1.XX``; if
+that says ``26``, some test failures are expected (at which point, you
+can rely on `TravisCI`_ to run your tests for you). 
+
+You could also install your own version of ``libxslt`` from source, but 
+you're probably going to have a bad time.
+
+.. _`TravisCI`: https://travis-ci.org/dlanger/inlinestyler
 
 License
 =======

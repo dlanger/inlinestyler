@@ -1,3 +1,9 @@
+0.2.1
+=====
+
+* Adding the start of a test suite, which (for now) only runs on TravisCI
+* Replace urllib calls with ones to requests
+
 0.1.6
 =====
 
