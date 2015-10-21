@@ -35,7 +35,9 @@ class Conversion(object):
                         parsed_url = urlparse.urlparse(sourceURL)
                         csspath = urlparse.urljoin(parsed_url.scheme + "://" + parsed_url.hostname, csspath)
 
-                css_content = requests.get(csspath).text
+                # Get css file. Don't verify SSL certificates. It's just a css.
+                # Cloudfront does not have correct SSL certificate and it fails.
+                css_content = requests.get(csspath, verify=False).text
                 aggregate_css += ''.join(css_content)
 
                 element.getparent().remove(element)
