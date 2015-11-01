@@ -9,5 +9,9 @@ install:
 #  - python -c "from lxml import etree; print etree.LIBXSLT_COMPILED_VERSION; print etree.LIBXSLT_VERSION; print etree.LIBXML_VERSION"
   - make init
 
+cache:
+  directories:
+    - $HOME/.cache/pip
 
 script:  make test
+sudo: false
