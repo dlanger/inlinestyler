@@ -1,3 +1,8 @@
+0.2.2
+=====
+
+* Changing ElementTree to emit HTML, and not XML (thanks @crimsoncow)
+
 0.2.1
 =====
 

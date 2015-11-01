@@ -19,10 +19,10 @@ class Conversion(object):
         self.CSSErrors = []
         self.CSSUnsupportErrors = dict()
         self.supportPercentage = 100
-        self.convertedHTML = ""
+        self.convertedHTML = u""
 
     def perform(self, document, sourceHTML, sourceURL, encoding=None):
-        aggregate_css = ""
+        aggregate_css = u""
 
         # Retrieve CSS rel links from html pasted and aggregate into one string
         CSSRelSelector = CSSSelector("link[rel=stylesheet],link[rel=StyleSheet],link[rel=STYLESHEET]")
@@ -59,8 +59,7 @@ class Conversion(object):
                 v = style.getCssText(separator=u'')
                 element.set('style', v)
 
-        self.convertedHTML = etree.tostring(document, method="xml", pretty_print=True, encoding=encoding)
-        self.convertedHTML = self.convertedHTML.decode(encoding).replace('&#13;', '')  # Tedious raw conversion of line breaks.
+        self.convertedHTML = etree.tostring(document, method="html", pretty_print=True).encode(encoding)
         return self
 
     def styleattribute(self, element):
