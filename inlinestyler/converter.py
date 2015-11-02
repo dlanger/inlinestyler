@@ -21,7 +21,7 @@ class Conversion(object):
         self.supportPercentage = 100
         self.convertedHTML = u""
 
-    def perform(self, document, sourceHTML, sourceURL, encoding=None):
+    def perform(self, document, sourceHTML, sourceURL, encoding='unicode'):
         aggregate_css = u""
 
         # Retrieve CSS rel links from html pasted and aggregate into one string
@@ -59,7 +59,7 @@ class Conversion(object):
                 v = style.getCssText(separator=u'')
                 element.set('style', v)
 
-        self.convertedHTML = etree.tostring(document, method="html", pretty_print=True).encode(encoding)
+        self.convertedHTML = etree.tostring(document, method="html", pretty_print=True, encoding=encoding)
         return self
 
     def styleattribute(self, element):

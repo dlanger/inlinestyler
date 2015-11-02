@@ -1,7 +1,7 @@
 from lxml import etree
 from inlinestyler.converter import Conversion
 
-def inline_css(html_message, encoding="UTF-8"):
+def inline_css(html_message, encoding='unicode'):
     """
     Inlines all CSS in an HTML string
 
