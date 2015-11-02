@@ -30,5 +30,6 @@ setup(
         'cssutils',
         'lxml',
         'requests>=1.0.0',
+        'six'
     ]
 )
