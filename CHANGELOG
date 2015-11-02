@@ -1,3 +1,8 @@
+0.2.3
+=====
+
+* Fixing Python 3 compatibility which 0.2.2 broke (thanks Piotr Maliński)
+
 0.2.2
 =====
 
