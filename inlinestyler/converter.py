@@ -1,6 +1,5 @@
 import os
 import sys
-import six
 
 try:
     import urlparse
@@ -22,7 +21,7 @@ class Conversion(object):
         self.supportPercentage = 100
         self.convertedHTML = u""
 
-    def perform(self, document, sourceHTML, sourceURL, encoding=six.u):
+    def perform(self, document, sourceHTML, sourceURL, encoding='unicode'):
         aggregate_css = u""
 
         # Retrieve CSS rel links from html pasted and aggregate into one string
