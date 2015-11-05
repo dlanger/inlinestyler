@@ -2,7 +2,7 @@
 inlinestyler - Making Styled HTML Email Easy
 ============================================
 
-:Version: 0.2.3
+:Version: 0.2.4
 :Download: http://pypi.python.org/pypi/inlinestyler/
 :Source: http://github.com/dlanger/inlinestyler/
 :Keywords: inline, HTML, CSS, email, preflight
