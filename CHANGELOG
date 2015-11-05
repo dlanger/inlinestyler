@@ -1,18 +1,25 @@
-0.2.3
-=====
+# Change Log
+All notable changes to this project will be documented in this file.
+This project adheres to [Semantic Versioning](http://semver.org/).
 
-* Fixing Python 3 compatibility which 0.2.2 broke (thanks Piotr Maliński)
+## [0.2.4] - Unreleased
+### Added
+- Trove classifiers and Travis CI configuration for Python 3
 
-0.2.2
-=====
+## [0.2.3] - 2015-11-02
+### Fixed
+- Python 3 compatibility which 0.2.2 broke (thanks Piotr Maliński)
 
-* Changing ElementTree to emit HTML, and not XML (thanks @crimsoncow)
+## [0.2.2]
+### Changed
+- ElementTree now emits HTML, not XML (thanks @crimsoncow)
 
-0.2.1
-=====
+## [0.2.1]
+### Added
+- The start of a test suite, which (for now) only passes on TravisCI
 
-* Adding the start of a test suite, which (for now) only runs on TravisCI
-* Replace urllib calls with ones to requests
+### Changed
+- Replace urllib calls with ones to requests
 
 0.1.6
 =====
