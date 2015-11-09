@@ -2,12 +2,20 @@ language: python
 
 python:
   - "2.7"
+  - "3.4"
+  - "3.2"
+  - "2.6"
 
-install: 
-# This gets the right libxslt installed, but then lxml doesn't use it 
+install:
+# This gets the right libxslt installed, but then lxml doesn't use it
 #  - wget http://xmlsoft.org/sources/libxslt-1.1.28.tar.gz; tar xf libxslt-1.1.28.tar.gz; pushd libxslt-1.1.28; CFLAGS="-O0" ./configure && make && sudo make install; popd
 #  - python -c "from lxml import etree; print etree.LIBXSLT_COMPILED_VERSION; print etree.LIBXSLT_VERSION; print etree.LIBXML_VERSION"
+  - pip install -U pip wheel
   - make init
 
+cache:
+  directories:
+    - $HOME/.cache/pip
 
 script:  make test
+sudo: false

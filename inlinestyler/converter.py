@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import os
 import sys
 
@@ -21,7 +22,7 @@ class Conversion(object):
         self.supportPercentage = 100
         self.convertedHTML = ""
 
-    def perform(self, document, sourceHTML, sourceURL, encoding=None):
+    def perform(self, document, sourceHTML, sourceURL, encoding='unicode'):
         aggregate_css = ""
 
         # Retrieve CSS rel links from html pasted and aggregate into one string
@@ -58,11 +59,10 @@ class Conversion(object):
         ignore_list = ['html', 'head', 'title', 'meta', 'link', 'script']
         for element, style in styledict.items():
             if element.tag not in ignore_list:
-                v = style.getCssText(separator=u'')
+                v = style.getCssText(separator='')
                 element.set('style', v)
 
-        self.convertedHTML = etree.tostring(document, method="xml", pretty_print=True, encoding=encoding)
-        self.convertedHTML = self.convertedHTML.decode(encoding).replace('&#13;', '')  # Tedious raw conversion of line breaks.
+        self.convertedHTML = etree.tostring(document, method="html", pretty_print=True, encoding=encoding)
         return self
 
     def styleattribute(self, element):
@@ -84,7 +84,7 @@ class Conversion(object):
         support_totalrate = 0
         compliance = dict()
 
-        mycsv = csv.DictReader(open(os.path.join(os.path.dirname(__file__), "css_compliance.csv")), delimiter=',')
+        mycsv = csv.DictReader(open(os.path.join(os.path.dirname(__file__), "css_compliance.csv")), delimiter=str(','))
 
         for row in mycsv:
             # Count clients so we can calculate an overall support percentage later
