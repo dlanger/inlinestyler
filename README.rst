@@ -37,10 +37,9 @@ This project is relatively unmaintained. I will continue to do simple bugfixes
 (and patches with tests are welcome), but I won't be adding features or making
 new CSS attributes work.
 
-If this doesn't do what you need, check out `premailer`_.
+If this doesn't do what you need, check out the `premailer project`_.
 
-.. _`premailer`: https://github.com/peterbe/premailer
-
+.. _`premailer project`: https://github.com/peterbe/premailer/
 
 History
 =======
