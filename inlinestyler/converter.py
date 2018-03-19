@@ -83,7 +83,7 @@ class Conversion(object):
         compliance = dict()
 
         with open(os.path.join(os.path.dirname(__file__), "css_compliance.csv")) as csv_file:
-            compat_list = csv_file.read()
+            compat_list = csv_file.readlines()
 
         mycsv = csv.DictReader(compat_list, delimiter=str(','))
 
