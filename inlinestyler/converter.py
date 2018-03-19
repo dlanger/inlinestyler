@@ -82,7 +82,8 @@ class Conversion(object):
         support_totalrate = 0
         compliance = dict()
 
-        mycsv = csv.DictReader(open(os.path.join(os.path.dirname(__file__), "css_compliance.csv")), delimiter=str(','))
+        with open(os.path.join(os.path.dirname(__file__), "css_compliance.csv")) as csv_file:
+            mycsv = csv.DictReader(csv_file, delimiter=str(','))
 
         for row in mycsv:
             # Count clients so we can calculate an overall support percentage later
