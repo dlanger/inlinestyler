@@ -4,7 +4,7 @@
 - Trove classifiers and Travis CI configuration for Python 3
 
 ### Fixed
-- Closes file handlers after use (#5)
+- Closes file handlers after use (#25)
 
 ## [0.2.3] - 2015-11-02
 ### Fixed
