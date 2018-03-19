@@ -33,11 +33,12 @@ def test_inline_css_in_head():
     """
 
     expected = """<html>
-<head></head>
-<body>
+        <head>
+            </head>
+        <body>
             Hello <span class="emphasis" style="font-weight: bold">World</span>!
         </body>
-</html>
+    </html>
 """
     inlined = inline_css(document)
     assert expected == inlined
