@@ -29,12 +29,25 @@ To see what `inline-styler` can do, check out this `demo`_.
 .. _`Premailer`: http://premailer.dialect.ca/
 .. _`demo`: http://inlinestyler.torchboxapps.com/
 
+
+Caveat Emptor
+=============
+
+This project is relatively unmaintained. I will continue to do simple bugfixes 
+(and patches with tests are welcome), but I won't be adding features or making
+new CSS attributes work.
+
+If this doesn't do what you need, check out `premailer`_.
+
+.. _`premailer`: https://github.com/peterbe/premailer
+
+
 History
 =======
 
-`Dave Cranwell`_ wrote the original `inline-styler`_ single-app Django project, 
-and (graciously) released it. `inlinestyler` is a refactor of that project into 
-a free-standing package usable outside of Django.
+`Dave Cranwell`_ wrote the original `inline-styler`_ single-app Django project. 
+`inlinestyler` is a refactor of that project into a free-standing package usable 
+outside of Django.
 
 .. _`inline-styler`: https://github.com/davecranwell/inline-styler
 .. _`Dave Cranwell`: http://www.twitter.com/davecranwell
