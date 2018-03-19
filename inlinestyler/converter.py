@@ -83,7 +83,9 @@ class Conversion(object):
         compliance = dict()
 
         with open(os.path.join(os.path.dirname(__file__), "css_compliance.csv")) as csv_file:
-            mycsv = csv.DictReader(csv_file, delimiter=str(','))
+            compat_list = csv_file.read()
+
+        mycsv = csv.DictReader(compat_list, delimiter=str(','))
 
         for row in mycsv:
             # Count clients so we can calculate an overall support percentage later
