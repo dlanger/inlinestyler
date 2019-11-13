@@ -22,7 +22,7 @@ class Conversion(object):
         self.supportPercentage = 100
         self.convertedHTML = ""
 
-    def perform(self, document, sourceHTML, sourceURL, encoding='unicode'):
+    def perform(self, document, sourceHTML, sourceURL, encoding='unicode', remove_origin=True):
         aggregate_css = ""
 
         # Retrieve CSS rel links from html pasted and aggregate into one string
@@ -36,10 +36,13 @@ class Conversion(object):
                         parsed_url = urlparse.urlparse(sourceURL)
                         csspath = urlparse.urljoin(parsed_url.scheme + "://" + parsed_url.hostname, csspath)
 
-                css_content = requests.get(csspath).text
+                # Get css file. Don't verify SSL certificates. It's just a css.
+                # Cloudfront does not have correct SSL certificate and it fails.
+                css_content = requests.get(csspath, verify=False).text
                 aggregate_css += ''.join(css_content)
 
-                element.getparent().remove(element)
+                if remove_origin:
+                    element.getparent().remove(element)
             except:
                 raise IOError('The stylesheet ' + element.get("href") + ' could not be found')
 
@@ -48,7 +51,9 @@ class Conversion(object):
         matching = CSSStyleSelector.evaluate(document)
         for element in matching:
             aggregate_css += element.text
-            element.getparent().remove(element)
+
+            if remove_origin:
+                element.getparent().remove(element)
 
         # Convert document to a style dictionary compatible with etree
         styledict = self.get_view(document, aggregate_css)
