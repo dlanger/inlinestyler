@@ -9,6 +9,8 @@ inlinestyler - Making Styled HTML Email Easy
 
 `inlinestyler` is an easy way to locally inline CSS into an HTML email message.
 
+test
+
 Styling HTML email is a `black art`_. CSS works, but only when it's been placed
 inline on the individual elements (and event then, not always) - which makes
 development frustrating, and iteration slow. 
