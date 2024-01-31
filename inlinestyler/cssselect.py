@@ -44,6 +44,12 @@ class CSSSelector(etree.XPath):
             hex(abs(id(self)))[2:],
             self.css)
 
+    def evaluate(self, doc):
+        try:
+            return super(CSSSelector, self).evaluate(doc)
+        except AttributeError:
+            return self(doc)
+                   
 ##############################
 ## Token objects:
 
